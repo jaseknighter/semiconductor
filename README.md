@@ -38,8 +38,8 @@ some scripts (e.g. cheat codes and flora) have custom state handling features th
 after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` menu.
 
 ### shortcuts to speed up registration
-* in the file */lib/globals.lua* set the parameter `norns_name` to the name of your norns.
-* in the file */lib/globals.lua* set the parameter `host_ip` to the name of your norns.
+* for each norns in the ensemble, in the file */lib/globals.lua*, set the parameter `norns_name` to a unique name.
+* for each norns in the ensemble, in the file */lib/globals.lua* set the parameter `host_ip` to the name of the one norns that will act as the host for the ensemble.
 
 ## using this mod with a single norns
 this mod will work with just a single norns which is nice for developing the code for this mod but not much else 
