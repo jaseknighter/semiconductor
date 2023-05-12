@@ -8,14 +8,14 @@ local osc_lib = {}
 -- paths
 --[[
 /preregister, {ip, norns_name}
-/register, {ip,norns_name,script_name,params}
+/register, {ip,norns_name,script,params}
 /unregister, {ip,norns_name}
 /registrations. {registered_ips}
 /request_control
 /accept_control
 
-/params_updated, {ip,norns_name,script_name,updated_params}
-/set_param,{ip,norns_name,script_name,param_id,param_value}
+/params_updated, {ip,norns_name,script,updated_params}
+/set_param,{ip,norns_name,script,param_id,param_value}
 
 ]]
 
@@ -25,7 +25,7 @@ local osc_lib = {}
 
 
 function osc.event(path,args,from)
-  -- print("path",path)
+  print("osc.event path",path)
   args = args and args or {}
   if path=="register_with_host" then
     table.insert(menu.registrations,{ip=args[1], norns_name=args[2], script=args[3]})
@@ -61,16 +61,30 @@ function osc.event(path,args,from)
   elseif path=="script_updated_broadcast" then
     --broadcast message about new script loaded to registered norns
   elseif path=="get_params_call" then
-    -- osc_lib.send(path,'test_return_async_await',args)
     local callback = args[1]
     local params_json = json.encode(params)
-    osc_lib.send({from[1],10111},'get_params_response',{callback,params_json})
+    local len = string.len(params_json)
+    local max_slice = 800
+    local num_iterations = math.ceil(len/max_slice)
+    local norns_name = args[2]
+    local script = args[3]
+    for i=1,num_iterations do
+      local slice_idx = i.."_"..num_iterations
+      local slice_start = 1+(max_slice*(i-1))
+      local slice_end = max_slice + (max_slice*(i-1))
+      local slice = string.sub(params_json,slice_start,slice_end)
+      osc_lib.send({from[1],10111},'get_params_response',{callback,slice,slice_idx,norns_name, script})
+    end
+    -- osc_lib.send({from[1],10111},'get_params_response',{callback,params_json})
   elseif path=="get_params_response" then
     -- print("params received", table.unpack(args))
-    tab.print(callbacks)
+    -- tab.print(callbacks)
     local callback = args[1]
-    local params_json = args[2]
-    callbacks[callback](params_json)
+    local slice = args[2]
+    local slice_idx = args[3]
+    local norns_name = args[4]
+    local script = args[5]
+    callbacks[callback](slice,slice_idx,norns_name, script)
   elseif path=="get_string_call" then
     -- osc_lib.send(path,'test_return_async_await',args)
     local callback = args[1]

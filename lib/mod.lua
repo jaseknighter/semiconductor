@@ -13,6 +13,7 @@
     * add cancellation for registering norns name and ip
     * figure out why REGISTER menu doesn't immediately udpate after registration ('unregister' doesn't show)
     * figure out how to switch hosts
+    * update mod menu values when selected script's params are updated
 ]]
 
 
@@ -62,7 +63,7 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
       menu.local_script_loaded = true
       params:add_separator("semiconductor")
     
-      params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},1)
+      params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
       params:set_action("semiconductor_host_enabled", function(x) 
         if x == 2 then
           menu.set_host_mode(true)

@@ -252,8 +252,10 @@ elseif p.mode == p.mSCRIPT_SELECT then
     screen.clear()
     --IMPORTANT: this is where we get_params
     p.selected_script = i
-    local ip = p.registrations[p.selected_script].ip
-    pparams:get_params(ip,p.params_loaded)
+    local norns_ip = p.registrations[p.selected_script].ip
+    local script = p.registrations[p.selected_script].script
+    local norns_name = p.registrations[p.selected_script].norns_name
+    pparams:get_params(p.params_loaded, norns_ip, norns_name, script)
 
   end
   -- EDIT

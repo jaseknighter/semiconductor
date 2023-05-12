@@ -38,19 +38,38 @@ function player_params:new()
   end
 
   --- get params.
-  function p:get_params(ip,final_cb)
+  p.params_slices = {}
+  p.params_json = ""
+  function p:get_params(final_cb, norns_ip, norns_name, script)
     cbid = p.gen_cb()
-    callbacks[cbid] = function(params_json)
-      print("get params callback returned",cbid)
-      callbacks[cbid]=nil
-      local prams = json.decode(params_json)
-      for k,v in pairs(prams) do
-        self[k] = v
-      end   
-      final_cb()
+    callbacks[cbid] = function(params_slice, slice_idx, norns_name, script)
+      -- print("get params callback returned",cbid, slice_idx)
+      local sep_idx = string.find(slice_idx,"_")
+      local slice_num = string.sub(slice_idx,1,sep_idx-1)
+      local num_slices = string.sub(slice_idx,sep_idx+1,string.len(slice_idx))
+      if slice_num == 1 then
+        p.params_slices = {}
+      end
+      p.params_slices[tonumber(slice_num)] = params_slice
+      if slice_num == num_slices then
+        p.params_json = ""
+        print("reassemble slices ",sep_idx,slice_num,num_slices,slice_num==num_slices)
+        for i=1,slice_num do
+          p.params_json = p.params_json .. p.params_slices[i]
+        end
+        callbacks[cbid]=nil
+        self.norns_name = norns_name
+        self.script = script
+        print("norns_name, script",norns_name, script)
+        local prams = json.decode(p.params_json)
+        for k,v in pairs(prams) do
+          self[k] = v
+        end   
+        final_cb()
+      end
     end
-    local to = {ip,10111}
-    osc_lib.send(to,'get_params_call',{cbid})
+    local to = {norns_ip,10111}
+    osc_lib.send(to,'get_params_call',{cbid,norns_name, script})
   end
 
   --- delta.
