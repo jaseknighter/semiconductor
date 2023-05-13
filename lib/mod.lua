@@ -14,12 +14,17 @@
     * figure out why REGISTER menu doesn't immediately udpate after registration ('unregister' doesn't show)
     * figure out how to switch hosts
     * update mod menu values when selected script's params are updated
+    * update p.triggered to account for multiple script registrations
+    * address use case: host norns stops hosting (e.g. norns restarts or host param is set to "off")
 ]]
 
 
 local mod = require 'core/mods'
 
+include('semiconductor/lib/globals')
 menu = include('semiconductor/lib/menu')
+player_params = include('semiconductor/lib/player_params')
+
 -- local menu = include('semiconductor/lib/menu')
 
 --

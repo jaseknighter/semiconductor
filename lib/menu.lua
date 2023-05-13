@@ -4,15 +4,14 @@ local mod = require 'core/mods'
 local fileselect = require 'fileselect'
 local textentry = require 'textentry'
 
-local player_params = include('semiconductor/lib/player_params')
-local globals = include('semiconductor/lib/globals')
+-- local player_params = include('semiconductor/lib/player_params')
+-- local globals = include('semiconductor/lib/globals')
 
-pparams=player_params:new()
+-- pparams={}
 
 local page
 local mode_items_prereg = { "REGISTER >"}
 local mode_items_postreg = { "REGISTER >", "PLAYERS >"}
-local mode_items_script_selected = { "REGISTER >", "PLAYERS >", "EDIT >"}
 local mode_items = mode_items_prereg
 local reg_texts_pre = {"register"}
 local reg_texts_post = {"register","unregister"}
@@ -55,6 +54,7 @@ local p = {
   norns_name=nil,
   send = {},
   local_script_loaded = nil,
+  on = {},
 }
 
 -- -- add norns to local registration table
@@ -92,7 +92,7 @@ p.reg_norns_with_host = function(norns_name)
     print("register: ", norns_name)
     p.norns_name = norns_name
     screen.clear()
-    textentry.enter(p.reg_ip_with_host, globals.host_ip, "ENTER HOST IP")
+    textentry.enter(p.reg_ip_with_host, host_ip, "ENTER HOST IP")
   end
   screen.update()
 end 
@@ -114,25 +114,38 @@ end
 p.unregister = function()
   -- host_ip=wifi.ip
   local script = norns.state.name
-  for i=1,#menu.registrations do
-    local reg = menu.registrations[i]
+  for k,v in pairs(menu.registrations) do
+    local reg = menu.registrations[k]
     osc_lib.send({reg.ip,10111}, "unregister",{wifi.ip, p.norns_name, script})
   end
   -- p.update_menu()
 end 
 
+p.get_num_registrations = function()
+  local num_reg=0
+  for k,v in pairs(menu.registrations) do
+    if k then num_reg = num_reg+1 end
+  end
+  return num_reg
+end
+
+p.get_registration_by_idx = function(idx_target)
+  local idx=1
+  for k,v in pairs(menu.registrations) do
+    if idx==idx_target then return v end
+    idx=idx+1
+  end
+end
+
 p.update_menu = function()
-  if #p.registrations > 0 and pparams.count == 0 then
+  if p.get_num_registrations() > 0 then
     print("update_menu registered")
     mode_items = mode_items_postreg
     reg_texts = reg_texts_post
-  elseif pparams.count == 0 then
+  else
     print("update_menu prereg")
     mode_items = mode_items_prereg
     reg_texts = reg_texts_pre
-  else 
-    print("update_menu script selected to edit!")
-    mode_items = mode_items_script_selected
   end
 end
 
@@ -157,38 +170,41 @@ p.reset = function()
   p.param_id = nil
 end
 
-local function build_page()
+local function build_page(norns_to_edit)
   page = {}
-  if p.mode == p.mEDIT and pparams.count > 0 then
-    print("build edit page")
+  if p.mode == p.mEDIT then
+    print("build edit page",norns_to_edit)
     local i = 1
     repeat
-      if pparams:visible(i) then table.insert(page, i) end
-      if pparams:t(i) == pparams.tGROUP then
-        i = i + pparams:get_group_size(i) + 1
+      if pparams[norns_to_edit]:visible(i) then table.insert(page, i) end
+      if pparams[norns_to_edit]:t(i) == pparams[norns_to_edit].tGROUP then
+        i = i + pparams[norns_to_edit]:get_group_size(i) + 1
       else i = i + 1 end
-    until i > pparams.count
+    until i > pparams[norns_to_edit].count
   elseif p.mode == p.mSCRIPT_SELECT then
-    for i=1,#p.registrations do table.insert(page,i) end
+    print("build script select menu")
+    for i=1,p.get_num_registrations() do table.insert(page,i) end
   elseif p.mode == p.mREGISTER then
     for i=1,#reg_texts do table.insert(page,i) end
   end
 end
 
 function p.selected_script_unregistered()
-  pparams=player_params:new()
-  p.selected_script=nil
-  p.on = {}
-  p.pos=0
-  p:set_menu_mode("mMAIN_MENU")
-  build_page()
-  p.update_menu()
+  print("unregistered: NEED TO FIX THIS!!!!")
+  -- pparams=player_params:new()
+  -- p.selected_script=nil
+  -- p.on = {}
+  -- p.pos=0
+  -- p:set_menu_mode("mMAIN_MENU")
+  -- build_page()
+  -- p.update_menu()
 end
 
 local function build_sub(sub)
   page = {}
-  for i = 1,pparams:get_group_size(sub) do
-    if pparams:visible(i + sub) then
+  local norns_to_edit = p.get_registration_by_idx(p.selected_script).norns_name
+  for i = 1,pparams[norns_to_edit]:get_group_size(sub) do
+    if pparams[norns_to_edit]:visible(i + sub) then
       table.insert(page, i + sub)
     end
   end
@@ -197,7 +213,7 @@ end
 function p:set_menu_mode(mode)
   p.mode = self[mode]
   print("mode",p.mode,self[mode],mode)
-  build_page()
+  if mode ~= "mEDIT" then build_page() end
 end
 
 p.key = function(n,z)
@@ -234,7 +250,7 @@ p.key = function(n,z)
         print("register")
         screen.clear()
         p.registering=true
-        textentry.enter(p.reg_norns_with_host, globals.norns_name, "ENTER NORNS NAME")
+        textentry.enter(p.reg_norns_with_host, norns_name, "ENTER NORNS NAME")
         screen.update()
       elseif reg_texts[i] == "unregister" then
         p.unregister()
@@ -252,77 +268,82 @@ elseif p.mode == p.mSCRIPT_SELECT then
     screen.clear()
     --IMPORTANT: this is where we get_params
     p.selected_script = i
-    local norns_ip = p.registrations[p.selected_script].ip
-    local script = p.registrations[p.selected_script].script
-    local norns_name = p.registrations[p.selected_script].norns_name
-    pparams:get_params(p.params_loaded, norns_ip, norns_name, script)
-
+    p:set_menu_mode("mEDIT")
+    local norns_to_edit = p.get_registration_by_idx(p.selected_script).norns_name
+    print("selscript,norns_to_edit",p.selected_script,norns_to_edit)
+    build_page(norns_to_edit)
+    p.update_menu()
   end
   -- EDIT
-  elseif p.mode == p.mEDIT and pparams.count > 0 then
-    local i = page[p.pos+1]
-    local t = pparams:t(i)
-    if n==2 and z==1 then
-      print(i,t,p.pos)
-      if p.group==true then
-        p.group = false
-        build_page()
-        p.pos = p.oldpos
-      elseif p.mode ~= p.mMAIN_MENU then
-        p.mode = p.mMAIN_MENU
+elseif p.mode == p.mEDIT and pparams[p.get_registration_by_idx(p.selected_script).norns_name].count > 0 then
+  local norns_to_edit = p.get_registration_by_idx(p.selected_script).norns_name
+  local i = page[p.pos+1]
+  local t = pparams[norns_to_edit]:t(i)
+  if n==2 and z==1 then
+    print(i,t,p.pos)
+    if p.group==true then
+      p.group = false
+      build_page(norns_to_edit)
+      p.pos = p.oldpos
+    elseif p.mode ~= p.mMAIN_MENU then
+      p.mode = p.mSCRIPT_SELECT
+      build_page()
+      p.pos = p.oldpos
+    end
+  elseif n==3 and z==1 then
+    if t == pparams[norns_to_edit].tGROUP then
+      build_sub(i)
+      p.group = true
+      p.groupid = i
+      -- p.groupname = params:string(i)
+      local mp = pparams[norns_to_edit]:lookup_param(i)
+      p.groupname = mp.name
+      p.oldpos = p.pos
+      p.pos = 0
+    elseif t == pparams[norns_to_edit].tSEPARATOR then
+      local n = p.pos+1
+      repeat
+        n = n+1
+        if n > #page then n = 1 end
+      until pparams[norns_to_edit]:t(page[n]) == pparams[norns_to_edit].tSEPARATOR
+      p.pos = n-1
+    elseif t == pparams[norns_to_edit].tFILE then
+      -- if p.mode == p.mEDIT then
+      --   fileselect.enter(_path.dust, p.newfile)
+      --   local fparam = params:lookup_param(i)
+      --   local dir_prev = fparam.dir or p.dir_prev
+      --   if dir_prev ~= nil then
+      --     fileselect.pushd(dir_prev)
+      --   end
+      -- end
+    elseif t == pparams[norns_to_edit].tTEXT then
+      if p.mode == p.mEDIT then
+        textentry.enter(p.newtext, p.selected_value, "PARAM: "..pparams[norns_to_edit]:get_name(i))
       end
-    elseif n==3 and z==1 then
-      if t == pparams.tGROUP then
-        build_sub(i)
-        p.group = true
-        p.groupid = i
-        -- p.groupname = params:string(i)
-        local mp = pparams:lookup_param(i)
-        p.groupname = mp.name
-        p.oldpos = p.pos
-        p.pos = 0
-      elseif t == pparams.tSEPARATOR then
-        local n = p.pos+1
-        repeat
-          n = n+1
-          if n > #page then n = 1 end
-        until pparams:t(page[n]) == pparams.tSEPARATOR
-        p.pos = n-1
-      elseif t == pparams.tFILE then
-        -- if p.mode == p.mEDIT then
-        --   fileselect.enter(_path.dust, p.newfile)
-        --   local fparam = params:lookup_param(i)
-        --   local dir_prev = fparam.dir or p.dir_prev
-        --   if dir_prev ~= nil then
-        --     fileselect.pushd(dir_prev)
-        --   end
-        -- end
-      elseif t == pparams.tTEXT then
-        if p.mode == p.mEDIT then
-          textentry.enter(p.newtext, p.selected_value, "PARAM: "..pparams:get_name(i))
-        end
-      elseif t == pparams.tTRIGGER then
-        if p.mode == p.mEDIT then
-          params:set(i)
-          p.triggered[i] = 2
-        end
-      elseif t == pparams.tBINARY and p.mode == p.mEDIT then 
-        local ip = p.registrations[p.selected_script].ip
-        pparams:delta(ip,i,1)
-        if pparams:lookup_param(i).behavior == 'trigger' then 
-          p.triggered[i] = 2
-        -- else p.on[i] = params:get(i) end
-        else p.on[i] = p.selected_value end
-      else
-        p.fine = true
+    elseif t == pparams[norns_to_edit].tTRIGGER then
+      if p.mode == p.mEDIT then
+        params:set(i)
+        p.triggered[i] = 2
       end
+    elseif t == pparams[norns_to_edit].tBINARY and p.mode == p.mEDIT then 
+      local reg = p.get_registration_by_idx(p.selected_script)
+      local ip = reg.ip
+      pparams[norns_to_edit]:delta(ip,i,1)
+      if pparams[norns_to_edit]:lookup_param(i).behavior == 'trigger' then 
+        p.triggered[i] = 2
+      -- else p.on[i] = params:get(i) end
+      else p.on[i] = p.selected_value end
+    else
+      p.fine = true
+    end
     elseif n==3 and z==0 then
       p.fine = false
-      if t == pparams.tBINARY then
+      if t == pparams[norns_to_edit].tBINARY then
         if p.mode == p.mEDIT then
-          local ip = p.registrations[p.selected_script].ip
-          pparams:delta(ip,i, 0)
-          if pparams:lookup_param(i).behavior ~= 'trigger' then
+          local reg = p.get_registration_by_idx(p.selected_script)
+          local ip = reg.ip
+            pparams[norns_to_edit]:delta(ip,i, 0)
+          if pparams[norns_to_edit]:lookup_param(i).behavior ~= 'trigger' then
             p.on[i] = p.selected_value
             -- p.on[i] = params:get(i) 
           end
@@ -369,16 +390,17 @@ p.enc = function(n,d)
   -- -- EDIT
   -- elseif p.mode == p.mEDIT or p.mode == mMAP then
     -- normal scroll
+    local norns_to_edit = p.get_registration_by_idx(p.selected_script).norns_name
     if n==2 and p.alt==false then
       local prev = p.pos
       p.pos = util.clamp(p.pos + d, 0, #page - 1)
       if p.pos ~= prev then p.redraw() end
-      p.selected_t=pparams:t(page[p.pos+1])
+      p.selected_t=pparams[norns_to_edit]:t(page[p.pos+1])
       if p.selected_t==pparams.tTEXT then
-        local mp = pparams:lookup_param(page[p.pos+1])
+        local mp = pparams[norns_to_edit]:lookup_param(page[p.pos+1])
         p.selected_value=mp.text
       elseif (p.selected_t==pparams.tBINARY) then
-        local mp = pparams:lookup_param(page[p.pos+1])
+        local mp = pparams[norns_to_edit]:lookup_param(page[p.pos+1])
         p.selected_value=mp.value
       else 
         --setting to nil because p.selected_value is only needed to get the value of text and binary in the key func 
@@ -392,14 +414,15 @@ p.enc = function(n,d)
         i = i+d
         if i > #page then i = 1 end
         if i < 1 then i = #page end
-      until pparams:t(page[i]) == pparams.tSEPARATOR or i==1
+      until pparams[norns_to_edit]:t(page[i]) == pparams[norns_to_edit].tSEPARATOR or i==1
       p.pos = i-1
     -- adjust value
-    elseif p.mode == p.mEDIT and n==3 and pparams.count > 0 then
+    elseif p.mode == p.mEDIT and n==3 and pparams[norns_to_edit].count > 0 then
       local dx = p.fine and (d/20) or d
       -- p.pvals[page[p.pos+1]]=nil
-      local ip = p.registrations[p.selected_script].ip
-      pparams:delta(ip,page[p.pos+1],dx)
+      local reg = p.get_registration_by_idx(p.selected_script)
+      local ip = reg.ip
+      pparams[norns_to_edit]:delta(ip,page[p.pos+1],dx)
       -- p.redraw()
     end
   end
@@ -469,7 +492,7 @@ elseif p.mode == p.mSCRIPT_SELECT and p.registering == false then
     if (i > 2 - p.pos) and (i < #page - p.pos + 3) then
       if i==3 then screen.level(15) else screen.level(4) end
       local pix = page[i+p.pos-2]
-      local reg = p.registrations[pix]
+      local reg = p.get_registration_by_idx(pix)
       local name = reg.norns_name
       local script = reg.script
       local txt = name .. " / " .. script
@@ -477,44 +500,50 @@ elseif p.mode == p.mSCRIPT_SELECT and p.registering == false then
       screen.text(txt)
       screen.move(127,10*i)
       -- add trigger rect
-      screen.rect(124, 10 * i - 4, 3, 3)
+      -- screen.rect(124, 10 * i - 4, 3, 3)
+      screen.text_right(">")
       screen.fill()
     end
   end
-  -- EDIT SCRIPT PARAMS
-  
+-- EDIT SCRIPT PARAMS
 elseif p.mode == p.mEDIT and page then
   if p.pos == 0 then
-    local n = "SEMICONDUCTOR"
+    local script = p.get_registration_by_idx(p.selected_script).script
+    local n = "SEMICONDUCTOR" .. " / " .. script
     if p.group then n = n .. " / " .. p.groupname end
     screen.level(4)
     screen.move(0,10)
     screen.text(n)
   end
+  if p.selected_script == nil then
+    p.selected_script=1
+    print("WARNING: selected script nil!!!")
+  end
+  local norns_to_edit = p.get_registration_by_idx(p.selected_script).norns_name
   for i=1,6 do
     if (i > 2 - p.pos) and (i < #page - p.pos + 3) then
       if i==3 then screen.level(15) else screen.level(4) end
         local pix = page[i+p.pos-2]
-        local t = pparams:t(pix)
-        if t == pparams.tSEPARATOR then
+        local t = pparams[norns_to_edit]:t(pix)
+        if t == pparams[norns_to_edit].tSEPARATOR then
           screen.move(0,10*i+2.5)
           screen.line_rel(127,0)
           screen.stroke()
           screen.move(63,10*i)
-          screen.text_center(pparams:get_name(pix))
-        elseif t == pparams.tGROUP then
+          screen.text_center(pparams[norns_to_edit]:get_name(pix))
+        elseif t == pparams[norns_to_edit].tGROUP then
           screen.move(0,10*i)
-          screen.text(pparams:get_name(pix) .. " >")
+          screen.text(pparams[norns_to_edit]:get_name(pix) .. " >")
         else
           screen.move(0,10*i)
-          screen.text(pparams:get_name(pix))
+          screen.text(pparams[norns_to_edit]:get_name(pix))
           screen.move(127,10*i)
-          if t ==  pparams.tTRIGGER then
+          if t ==  pparams[norns_to_edit].tTRIGGER then
             if p.triggered[pix] and p.triggered[pix] > 0 then
               screen.rect(124, 10 * i - 4, 3, 3)
               screen.fill()
             end
-          elseif t == pparams.tBINARY then
+          elseif t == pparams[norns_to_edit].tBINARY then
             fill = p.on[pix] or p.triggered[pix]
             if fill and fill > 0 then
               screen.rect(124, 10 * i - 4, 3, 3)
@@ -524,10 +553,9 @@ elseif p.mode == p.mEDIT and page then
             -- screen.text_right(str)
             local val
             if p.pvals[pix]==nil then 
-              -- val = params:string(pix)
-              -- p.pvals[pix] = val
-              local ip = p.registrations[p.selected_script].ip
-              clock.run(pparams.get_string,ip,pix)
+              local reg = p.get_registration_by_idx(p.selected_script)
+              local ip = reg.ip
+              clock.run(pparams[norns_to_edit].get_string,ip,pix)
               -- pparams.get_string(pix)
               val=""
             else
@@ -573,16 +601,17 @@ p.deinit = function()
   p.timer:stop()
 end
 
-p.params_loaded = function()
+p.params_loaded = function(norns_name)
   print("params loaded")
-  p.on = {}
-  for i,param in ipairs(pparams.params) do
-    if param.t == pparams.tBINARY then
-        if pparams:lookup_param(i).behavior == 'trigger' then 
+  -- p.on = {}
+  p.on[norns_name] = {}
+  for i,param in ipairs(pparams[norns_name].params) do
+    if param.t == pparams[norns_name].tBINARY then
+        if pparams[norns_name]:lookup_param(i).behavior == 'trigger' then 
           p.triggered[i] = 2
         else 
-          local mp = pparams:lookup_param(i)
-          p.on[i] = mp.value
+          local mp = pparams[norns_name]:lookup_param(i)
+          p.on[norns_name][i] = mp.value
           -- p.on[i] = params:get(i) 
         end
     end

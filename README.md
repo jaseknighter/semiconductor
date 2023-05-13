@@ -21,7 +21,6 @@ once a script has been selected, its parameters appear in the mod menu and can b
 * enter the `semiconductor` mod menu
 * enter the `REGISTER >` menu, select `register` and provide a name for your norns and then the ip address of the host (note: see *shortcuts* below)
 * enter the `PLAYERS >` menu and select a script to conduct 
-* enter the `EDIT >` menu to control the params of the script that was selected in the `PLAYERS >` menu
 
 ### leave the ensemble
 * enter the `semiconductor` mod menu

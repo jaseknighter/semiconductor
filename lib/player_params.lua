@@ -21,8 +21,6 @@ function player_params:new()
   }
   setmetatable(p, player_params)
 
-  callbacks={}
-
   --uuid from: https://gist.github.com/jrus/3197011
   local function uuid()
     local random = math.random
@@ -65,7 +63,7 @@ function player_params:new()
         for k,v in pairs(prams) do
           self[k] = v
         end   
-        final_cb()
+        final_cb(norns_name)
       end
     end
     local to = {norns_ip,10111}
