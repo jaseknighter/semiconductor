@@ -64,6 +64,5 @@ this mod will work with just a single norns (e.g. to take advantage of the macro
 
 ## todo
 * fix bugs
-* create parameters and mapping controls to update remote script params via midi
-* enable control of multiple scripts' params at the same time
-* built a macro interface to update multiple params at the same time
+* add more control interfaces (e.g. a lorenz param controller)
+
