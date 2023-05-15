@@ -68,7 +68,7 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
     menu.local_script_loaded = true
     params:add_separator("semiconductor")
   
-    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
+    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},1)
     params:set_action("semiconductor_host_enabled", function(x) 
       if x == 2 then
         menu.set_host_mode(true)
