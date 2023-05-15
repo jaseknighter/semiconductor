@@ -40,17 +40,21 @@ function osc.event(path,args,from)
     end
     menu:set_menu_mode("mMAIN_MENU")
   elseif path=="unregister" then
+    local reg_ix=1
     for k,v in pairs(menu.registrations) do
       local reg = menu.registrations[k]
       if reg.norns_name == args[2] then
         -- remove from local registration table
-        menu.registrations[k]=nil
         print("found script to unregister", args[2],args[3])
         -- if unregistered script is currently selected for editing, clear the params
-        if i == menu.selected_script then
+        if reg_ix == menu.selected_script then
           print("unregistered script is selected!!! clear params!!!")
-          menu.selected_script_unregistered()
+          menu.registrations[k]=nil
+          menu.selected_script_unregistered(reg.norns_name)
+        else
+          menu.registrations[k]=nil
         end
+        reg_ix = reg_ix + 1
       end
       -- osc_lib.send({reg.ip,10111}, "new_norns_registered",{args[1], args[2], args[3]})
     end
@@ -115,6 +119,41 @@ function osc.event(path,args,from)
       print("WARNING: callback not found for param index ", pix)
     end
 
+  elseif path=="set_to_range_call" then
+    -- osc_lib.send(path,'test_return_async_await',args)
+    -- local callback = args[1]
+    local types = {
+      tSEPARATOR = 0,
+      tNUMBER = 1,
+      tOPTION = 2,
+      tCONTROL = 3,
+      tFILE = 4,
+      tTAPER = 5,
+      tTRIGGER = 6,
+      tGROUP = 7,
+      tTEXT = 8,
+      tBINARY = 9,
+      sets = {},
+      count = 0
+    }
+    local pix = math.floor(args[1])
+    local val = args[2]
+    local type = params:t(math.floor(pix))
+    local converted_val
+    if type == types.tNUMBER or type == types.tOPTION or type == types.tBINARY then
+      local range = params:get_range(pix)
+      converted_val = util.linlin(0,1,range[1],range[2],val)
+      converted_val = math.floor(converted_val)
+    elseif type == types.tCONTROL or type == types.tTAPER then
+      local param = params:lookup_param(pix)
+      converted_val = param:map_value(val)
+    else
+      --
+    end
+    params:set(pix,converted_val)
+    -- local str = params:string(pix)
+    -- print("delta call", from[1], callback, pix,delta,str)
+    -- osc_lib.send({from[1],10111},'get_string_response',{callback,pix,str})
   elseif path=="delta_call" then
     -- osc_lib.send(path,'test_return_async_await',args)
     local callback = args[1]

@@ -84,6 +84,24 @@ function player_params:new()
       print("send delta call",pix,ip, to[1],to[2])
       osc_lib.send(to,'delta_call',{cbid,pix,delta})
     end
+  
+    --- set to range.
+  function p:set_to_range(ip,pix,val)
+      local to = {ip,10111}
+      osc_lib.send(to,'set_to_range_call',{pix,val})
+    -- osc_lib.send(to,'set_to_range_call',{cbid,pix,delta})
+      -- cbid = p.gen_cb()
+      -- callbacks[cbid] = function(pix,str)
+      --   -- print("get string callback returned",pix,string)
+      --   callbacks[cbid]=nil
+      --   menu.pvals[pix] = str
+      --   menu.redraw()
+      -- end
+      -- -- menu.pvals[pix]=""
+      -- local to = {ip,10111}
+      -- print("send delta call",pix,ip, to[1],to[2])
+      -- osc_lib.send(to,'delta_call',{cbid,pix,delta})
+    end
 
   --- count.
   -- function p:get_count()

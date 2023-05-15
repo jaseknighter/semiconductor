@@ -1,16 +1,15 @@
---
--- async-await code from: https://github.com/iamcco/async-await.lua
+-- superconductor
+-- a norns ensemble mod
 
---
--- require the `mods` module to gain access to hooks, menu, and other utility
--- functions.
---
+-- @jaseknighter
+-- docs: https://github.com/jaseknighter/semiconductor
 
 --[[
   todo:
-    * test binary and text params
+    * update code for params of type tFILE, tTEXT, tTRIGGER, tBINARY
     * add check for registering the same norns ip address multiple times
     * add cancellation for registering norns name and ip
+    * add small delay when requesting params so cpus aren't overloaded
     * figure out why REGISTER menu doesn't immediately udpate after registration ('unregister' doesn't show)
     * figure out how to switch hosts
     * update mod menu values when selected script's params are updated
@@ -20,6 +19,7 @@
 
 
 local mod = require 'core/mods'
+local controlspec = require 'controlspec'
 
 include('semiconductor/lib/globals')
 menu = include('semiconductor/lib/menu')
@@ -63,22 +63,67 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
   -- tweak global environment here ahead of the script `init()` function being called
   print("semiconductor init")
   local old_init = init
-    init = function()
-      old_init()
-      menu.local_script_loaded = true
-      params:add_separator("semiconductor")
-    
-      params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
-      params:set_action("semiconductor_host_enabled", function(x) 
-        if x == 2 then
-          menu.set_host_mode(true)
-        else
-          menu.set_host_mode(false)
-        end
+  init = function()
+    old_init()
+    menu.local_script_loaded = true
+    params:add_separator("semiconductor")
+  
+    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
+    params:set_action("semiconductor_host_enabled", function(x) 
+      if x == 2 then
+        menu.set_host_mode(true)
+      else
+        menu.set_host_mode(false)
+      end
     end )
+    --[[
+      --macro control params
+      pix = -- get pix from menu.pmap_vals table
+      local dx = p.fine and (d/20) or d
+      local reg = p.get_registration_by_idx(p.selected_script)
+      local ip = reg.ip
+      pparams[norns_to_edit]:delta(ip,pix,dx)
+    ]]
+    params:add_group("macro controls",max_pmaps)
+    for i=1,max_pmaps do 
+      params:add_control("macro_control"..i," macro control"..i, controlspec.new(0, 1, "lin", 0.001, 0.0, ""))
+      params:set_action("macro_control"..i, function(val) 
+        mcm = get_macro_control_map(i)
+        for i=1,#mcm do
+          local norns_name = mcm[i].norns_name
+          local ip = mcm[i].ip
+          for j=1,#mcm[i].ixes do
+            pparams[norns_name]:set_to_range(ip,mcm[i].ixes[j],val)
+          end
+        end
+      end)
+    end
+    params:add_number("macro_x","macro x",1,max_pmaps,1)
+    params:add_number("macro_y","macro y",2,max_pmaps,2)
   end
 end)
 
+function get_macro_control_map(ix)
+  mcm={}
+  local script_num = 1
+  for k,v in pairs(menu.registrations) do
+    local norns_name = v.norns_name
+    mcm[script_num] = {}
+    mcm[script_num].norns_name = norns_name
+    mcm[script_num].ip = v.ip
+    mcm[script_num].ixes = {}
+    local pmap_vals = menu.pmap_vals[norns_name]
+    local num_params = 1
+    for k1,v1 in pairs(pmap_vals) do
+      if ix == v1 then
+        mcm[script_num].ixes[num_params] = k1
+        num_params = num_params + 1
+      end
+    end
+    script_num = script_num + 1
+  end
+  return mcm
+end
 
 --
 -- [optional] menu: extending the menu system is done by creating a table with

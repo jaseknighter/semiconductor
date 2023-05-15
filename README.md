@@ -2,13 +2,20 @@
 
 norns ensemble script
 
-this script was written to support the creation of irl norns ensembles, providing players a way of "conducting" a performance in a non-hierarchical manner.
+## background
+this script was written to support the creation of physically gathered together norns ensembles, providing players a way of "conducting" a performance in a non-hierarchical manner.
 
-using this mod, players register their norns with an arbitrarily selected "host" which then broadcasts each registration with all the other devices.
+it occurred to me that a whole lot of music performance involves control. also, and conversely, there has been a lot of music concerned more with giving up control to a machine with the development of generative music and instruments inspired by chaos (blippoo box and wing pinger, for example). this script is meant to promote a somewhat different approach, where a performance is built around performers in immediate physical proximity to one another giving up control to each other as a performative strategy.
 
-the registered norns can then see what scripts the other norns have currently loaded and select a script to conduct.
+## how does it work?
+using this mod, players gather together and connect their norns to the same network.
+then, they register their norns with an arbitrarily selected "host" which then broadcasts each registration with all the other devices.
 
-once a script has been selected, its parameters appear in the mod menu and can be controlled just as if the script was running on the norns locally.
+once registered, each norns can then see what scripts the other norns have currently loaded and then select parameters from one or more registered script to "conduct."
+
+the remote parameters that appear in this mod may be controlled (more or less) just as if the script was running on the norns locally.
+
+the mod also includes macro param features so multiple params on multiple norns can be mapped and controlled from a single macro param set by the mod. 
 
 ## instructions
 
@@ -29,6 +36,18 @@ once a script has been selected, its parameters appear in the mod menu and can b
 ### change the script
 if you want to change the script you are controlling, enter the `PLAYERS >` menu and select a new script
 
+### using the macro controls
+* enter the `PMAP` menu, select a registered script, and set one or more of the listed params to one of the macro controls.
+* by default, there are 10 macro controls that params can be mapped to. the variable `max_pmaps` defined in the */lib/globals.lua* file can be updated to generate more or less macro controls
+
+#### changing the macro controls directly
+* the macro controls are found in the main script parameters menu (PARAMETERS>EDIT) at the bottom of the list of params (i.e. following whatever params the main script loads by default into the PARAMETERS>EDIT menu)
+* since these macro controls are params, they can be midi mapped (e.g. to a 16n controller)
+
+#### xy controller: changing the macro controls directly from the mod
+* enter mod's `MACROS` menu, select `xy` and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
+* which macro controls are updated with the `xy controller` can be changed in the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 10 `macro controls`
+
 ## misc notes
 ### controlling complex scripts 
 some scripts (e.g. cheat codes and flora) have custom state handling features that will not be accessible from the `semiconductor` mod or, if accessible, may result in errors. *proceed with caution.*
@@ -41,12 +60,10 @@ after registering your norns with the `semiconductor` mod, if you change the scr
 * for each norns in the ensemble, in the file */lib/globals.lua* set the parameter `host_ip` to the name of the one norns that will act as the host for the ensemble.
 
 ## using this mod with a single norns
-this mod will work with just a single norns which is nice for developing the code for this mod but not much else 
+this mod will work with just a single norns (e.g. to take advantage of the macro controls)
 
 ## todo
 * fix bugs
 * create parameters and mapping controls to update remote script params via midi
 * enable control of multiple scripts' params at the same time
 * built a macro interface to update multiple params at the same time
-
-
