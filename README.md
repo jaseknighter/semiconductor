@@ -46,7 +46,7 @@ if you want to change the script you are controlling, enter the `PLAYERS >` menu
 
 #### xy controller: changing the macro controls directly from the mod
 * enter mod's `MACROS` menu, select `xy` and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
-* which macro controls are updated with the `xy controller` can be changed in the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 10 `macro controls`
+* which macro controls are updated with the `xy controller` can be changed in the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
 
 ## misc notes
 ### controlling complex scripts 
