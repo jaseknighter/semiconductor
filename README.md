@@ -11,7 +11,7 @@ it occurred to me that a whole lot of music performance involves control. also, 
 using this mod, players gather together and connect their norns to the same network.
 then, they register their norns with an arbitrarily selected "host" which then broadcasts each registration with all the other devices.
 
-once registered, each norns can then see what scripts the other norns have currently loaded and then select parameters from one or more registered script to "conduct."
+once registered, each norns can then see what scripts the other norns have currently loaded. each norns can then select parameters from one or more registered script to (semi)conduct.
 
 the remote parameters that appear in this mod may be controlled (more or less) just as if the script was running on the norns locally.
 
