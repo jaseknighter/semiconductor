@@ -47,6 +47,7 @@ if you want to change the script you are controlling, enter the `PLAYERS >` menu
 #### xy controller: changing the macro controls directly from the mod
 * enter mod's `MACROS` menu, select `xy` and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
 * which macro controls are updated with the `xy controller` can be changed in the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
+<<<<<<< HEAD
 
 ### data management
 
@@ -55,6 +56,8 @@ the `semiconductor data` sub-menu at the end of the PARAMETERS>EDIT menu provide
 there is a variable in the `/lib/save_load.lua` file called `AUTOSAVE_DEFAULT`. setting this variable to 2 means autosave is on by default. setting it to 1 means autosave is off by default.
 
 **IMPORTANT**: before loading data, be sure to have all the scripts loaded and registered that were part of the ensemble when the settings were saved. 
+=======
+>>>>>>> 561c679d769bac65947304bcfce12b973e0b2c75
 
 ## misc notes
 ### controlling complex scripts 
