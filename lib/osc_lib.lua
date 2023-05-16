@@ -47,7 +47,8 @@ function osc.event(path,args,from)
         -- remove from local registration table
         print("found script to unregister", args[2],args[3])
         -- if unregistered script is currently selected for editing, clear the params
-        if reg_ix == menu.selected_script then
+        if reg.norns_name == menu.norns_name then
+        -- if reg_ix == menu.selected_script then
           print("unregistered script is selected!!! clear params!!!")
           menu.registrations[k]=nil
           menu.selected_script_unregistered(reg.norns_name)

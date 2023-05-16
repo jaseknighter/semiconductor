@@ -19,11 +19,15 @@
 
 
 local mod = require 'core/mods'
-local controlspec = require 'controlspec'
+controlspec = require 'controlspec'
+textentry = require 'textentry'
+fileselect = require 'fileselect'
+
 
 include('semiconductor/lib/globals')
 menu = include('semiconductor/lib/menu')
 player_params = include('semiconductor/lib/player_params')
+sc_save_load = include('semiconductor/lib/save_load')
 
 -- local menu = include('semiconductor/lib/menu')
 
@@ -100,6 +104,7 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
     end
     params:add_number("macro_x","macro x",1,max_pmaps,1)
     params:add_number("macro_y","macro y",2,max_pmaps,2)
+    sc_save_load.init()
   end
 end)
 
