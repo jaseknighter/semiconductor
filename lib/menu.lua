@@ -148,6 +148,9 @@ p.get_num_registrations = function()
 end
 
 p.get_registration_by_idx = function(idx_target)
+  if idx_target == nil then
+    print("no get_registration_by_idx!!!")
+  end
   local idx=1
   for k,v in pairs(menu.registrations) do
     if idx==idx_target then return v end
@@ -668,6 +671,10 @@ p.redraw = function()
     p.selected_script = nil
   end
   screen.clear()
+  if #p.page < p.pos then
+    p.pos = 0
+    -- print("reset pos")
+  end
   _menu.draw_panel()
   -- MAIN MENU
   if p.mode == p.mMAIN_MENU then
