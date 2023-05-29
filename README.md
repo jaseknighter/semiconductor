@@ -34,27 +34,32 @@ the mod also includes macro param features so multiple params on multiple norns 
 * enter the `REGISTER >` menu and select `unregister`
 
 ### change the script
-if you want to change the script you are controlling, enter the `PLAYERS >` menu and select a new script
+if you want to change which script you are controlling, enter the `PLAYERS >` menu and select a new script and then select the param you want to adjust
 
-### using the macro controls
-* enter the `PMAP` menu, select a registered script, and set one or more of the listed params to one of the macro controls.
+### group sync
+there are three params that you can sync across all registered norns from the `group sync >` sub-menu found in `PARAMETERS>EDIT`:
+
+* `output levels`: change all the norns' output levels 
+* `tempos`: change all the norns' tempos
+* `clocks reset`: reset all the norns' clocks to sync them with one another 
+
+### macros
+macros allow you to change multiple paramaters at once, either within a single script or across multiple scripts.
+
+* from the SEMICONDUCTOR mod, enter the `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls. 
+* repeat the step above for a different registered norns to set params for multiple norns simultaneously.
 * by default, there are 10 macro controls that params can be mapped to. the variable `max_pmaps` defined in the */lib/globals.lua* file can be updated to generate more or less macro controls
 
 #### changing the macro controls directly
 * the macro controls are found in the main script parameters menu (PARAMETERS>EDIT) at the bottom of the list of params (i.e. following whatever params the main script loads by default into the PARAMETERS>EDIT menu)
 * since these macro controls are params, they can be midi mapped (e.g. to a 16n controller)
 
-#### xy controller: changing the macro controls directly from the mod
-* enter mod's `MACROS` menu, select `xy` and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
-* which macro controls are updated with the `xy controller` can be changed in the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
-
-### data management
-
-the `semiconductor data` sub-menu at the end of the PARAMETERS>EDIT menu provides options for saving, loading, deleting macro control settings. saving/loading mod matrix settings also saves/loads the parameters from the script currently loaded on the local norns.
-
-there is a variable in the `/lib/save_load.lua` file called `AUTOSAVE_DEFAULT`. setting this variable to 2 means autosave is on by default. setting it to 1 means autosave is off by default.
-
-**IMPORTANT**: before loading data, be sure to have all the scripts loaded and registered that were part of the ensemble when the settings were saved. 
+#### macro controllers
+you can change the macro controls directly from the mod menu 
+##### xy controller
+* map two or more params a couple of macros (see *macros* above)
+* select `xy` from the mod's `MACROS` menu and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
+* you can change which macro controls are updated with the `xy controller` from the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
 
 ## misc notes
 ### controlling complex scripts 

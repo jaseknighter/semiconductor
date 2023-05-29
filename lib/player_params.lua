@@ -174,7 +174,7 @@ function player_params:new()
     elseif self.params[pix] then
       return self.params[pix]
     else
-      error("invalid paramset pix: "..pix)
+      error("invalid pix")
     end
   end
 

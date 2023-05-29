@@ -122,7 +122,8 @@ p.reg_ip_with_host = function(host_ip)
   if host_ip ~= nil then -- cancel
     p.set_host_ip(host_ip)
     local script = norns.state.name
-    osc_lib.send({host_ip,10111}, "register_with_host",{wifi.ip, p.norns_name, script})
+    local ip = wifi.ip ~= "" and wifi.ip or host_ip
+    osc_lib.send({host_ip,10111}, "register_with_host",{ip, p.norns_name, script})
   end
   screen.clear()
   p.registering=false
@@ -645,6 +646,8 @@ p.enc = function(n,d)
   elseif p.mode == p.mMACRO_CONTROL then
     if macro_texts[p.selected_macro] == "xy" then
       xy.enc(n,d)  
+    -- lz elseif macro_texts[p.selected_macro] == "lorenz" then
+    -- lz lorenz.enc(n,d)  
     end
   end
 end
@@ -666,11 +669,14 @@ p.newtext = function(txt)
 end
 
 p.redraw = function()
+  -- lz local sc_lorenz_draw = false
   if p.registering == true then return end
   if p.selected_script and (p.mode ~= p.mEDIT and p.mode ~= p.mPMAP_EDIT) then
     p.selected_script = nil
   end
+  -- lz if sc_lorenz.draw == false then
   screen.clear()
+  -- lz end
   if #p.page < p.pos then
     p.pos = 0
     -- print("reset pos")
@@ -902,8 +908,18 @@ p.redraw = function()
   elseif p.mode == p.mMACRO_CONTROL then
     if macro_texts[p.selected_macro] == "xy" then
       xy.redraw()  
+    -- lz  elseif macro_texts[p.selected_macro] == "lorenz" then
+      -- lz sc_lorenz_draw = true
     end
   end
+
+  --[[ lorenz
+  if sc_lorenz_draw == true then
+    sc_lorenz:draw_pat(true)
+  else
+    sc_lorenz:draw_pat(false)
+  end
+  ]]
   screen.update()
 end
 
@@ -918,7 +934,7 @@ p.init = function()
 end
 
 p.init_complete = function()
-  print("menu init")
+  screen.clear()
   if p.page == nil then buildpage() end
   p.alt = false
   p.fine = false

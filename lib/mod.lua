@@ -19,7 +19,7 @@
 
 
 local mod = require 'core/mods'
-controlspec = require 'controlspec'
+cs = require 'controlspec'
 textentry = require 'textentry'
 fileselect = require 'fileselect'
 
@@ -28,8 +28,8 @@ include('semiconductor/lib/globals')
 menu = include('semiconductor/lib/menu')
 player_params = include('semiconductor/lib/player_params')
 sc_save_load = include('semiconductor/lib/save_load')
+--lz sc_lorenz = include('semiconductor/lib/macros/lorenz')
 
--- local menu = include('semiconductor/lib/menu')
 
 --
 -- [optional] a mod is like any normal lua module. local variables can be used
@@ -70,6 +70,7 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
   init = function()
     old_init()
     menu.local_script_loaded = true
+    --lz sc_lorenz.init()
     params:add_separator("semiconductor")
   
     params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
@@ -88,22 +89,121 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
       local ip = reg.ip
       pparams[norns_to_edit]:delta(ip,pix,dx)
     ]]
+    params:add_group("group sync",3)
+    params:add_control("output_levels", "output levels", 
+      cs.new(-math.huge,6,'db',0,norns.state.mix.output,"dB"))
+      params:set_action("output_levels", function(val) 
+        osc_lib.set_param_all("output_level",val)
+    end)
+    params:add_number("clock_tempos", "tempos", 1, 300, norns.state.clock.tempo)
+    params:set_action("clock_tempos", function(val) 
+      osc_lib.set_param_all("clock_tempo",val)
+    end)
+    params:add_trigger("clocks_reset", "clocks reset")
+    params:set_action("clocks_reset", function(val) 
+      osc_lib.set_param_all("clock_reset",val)
+    end)
+
+    -------------------------
+    --macro controls
+    -------------------------
     params:add_group("macro controls",max_pmaps)
-    for i=1,max_pmaps do 
-      params:add_control("macro_control"..i," macro control"..i, controlspec.new(0, 1, "lin", 0.001, 0.0, ""))
-      params:set_action("macro_control"..i, function(val) 
-        mcm = get_macro_control_map(i)
-        for i=1,#mcm do
-          local norns_name = mcm[i].norns_name
-          local ip = mcm[i].ip
-          for j=1,#mcm[i].ixes do
-            pparams[norns_name]:set_to_range(ip,mcm[i].ixes[j],val)
+      for i=1,max_pmaps do 
+        params:add_control("macro_control"..i," macro control"..i, cs.new(0, 1, "lin", 0.001, 0.0, ""))
+        params:set_action("macro_control"..i, function(val) 
+          mcm = get_macro_control_map(i)
+          for i=1,#mcm do
+            local norns_name = mcm[i].norns_name
+            local ip = mcm[i].ip
+            for j=1,#mcm[i].ixes do
+              pparams[norns_name]:set_to_range(ip,mcm[i].ixes[j],val)
+            end
           end
-        end
-      end)
+        end)
     end
     params:add_number("macro_x","macro x",1,max_pmaps,1)
     params:add_number("macro_y","macro y",2,max_pmaps,2)
+
+  --[[ lorenz
+    --lorenz params
+    params:add_group("lorenz macro params",7)
+
+    params:add{
+      type="option", id = "lz_x_input", name = "x input", options={"first","second","third"},default = 1,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }
+    params:add{
+      type="option", id = "lz_y_input", name = "y input", options={"first","second","third"},default = 2,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }
+
+    params:add{
+      type="number", id = "lz_x_offset", name = "x offset",min=-128, max=128, default = 0,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }
+    params:add{
+      type="number", id = "lz_y_offset", name = "y offset",min=-64, max=64, default = 0,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }
+
+    params:add{
+      type="number", id = "lz_xy_offset", name = "xy offset",min=-64, max=64, default = 0,
+      action=function(x) 
+        params:set("lz_x_offset",x)
+        params:set("lz_y_offset",x)
+        -- lorenz:clear()
+      end
+    }
+
+    params:add{
+      type="taper", id = "lz_x_scale", name = "x scale",min=0.01, max=10, default = 1,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }
+    
+    params:add{
+      type="taper", id = "lz_y_scale", name = "y scale",min=0.01, max=10, default = 1,
+      action=function(x) 
+        -- lorenz:clear()
+      end
+    }    
+
+    params:add_group("lorenz weights",16)
+    local xyz = {}
+    local sc_lz_weights_cs = cs.new(0, 3, 'lin', 0.01, 0, "",0.001)
+    for i=1,4 do
+      local outs = {"1st","2nd","3rd","sum"}
+      local axes = {"x","y","z"}
+      local out,axis
+      for j=1,3 do
+        if j==1 then
+          params:add_separator("output: " .. outs[i])
+        end
+        out=outs[i]
+        axis=axes[j]
+        local cs = deep_copy(sc_lz_weights_cs)
+        cs.default = LORENZ_WEIGHTS_DEFAULT[i][j]
+        params:add{
+          type="control", id = "sc_lz_weight"..i.."_"..j, name = "w-" .. out..": "..axis.."", controlspec=cs,
+          -- type="number", id = "sc_lz_weight"..i.."_"..j, name = "lz weight "..out..": "..axis.."", min=0,max=10,default = LORENZ_WEIGHTS_DEFAULT[i][j],
+          action=function(x) 
+            sc_lorenz.weights[i][j] = x
+          end
+        }
+        
+      end
+    end
+  ]]
+
     sc_save_load.init()
   end
 end)
@@ -136,43 +236,6 @@ end
 --
 
 
-function test_outside(from)
-  print("test outside successful from", from)
-end
-
-function test_osc_async_await()
-
-  aw.async(function ()
-    local osc_aa = aw.await(function (cb)
-      osc_lib.send({'192.168.0.193',10111},'test_call_async_await',{'my osc args'})
-      cb("success: osc_async_await test completed")
-    end)
-    print("osc async_await callback received: ",osc_aa)
-  end)
-end
-
-function test_async_await()
-  aw.async(function ()
-    print("async func starting")
-    local hello = aw.await(function (cb)
-      test_outside("hello")
-      timer = metro.init(function() 
-          cb("hello")
-      end, 1, 1)
-      timer:start()
-    end)
-  
-    local world = aw.await(function (cb)
-      test_outside("world")
-      timer = metro.init(function() 
-        cb("world")
-      end, 1, 1)
-      timer:start()
-    end)
-  
-    print(hello, world)
-  end)
-end
 
 mod.hook.register("script_post_cleanup", "clear the matrix for the next script", function()
   menu.unregister()

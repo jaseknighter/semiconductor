@@ -22,7 +22,13 @@ local osc_lib = {}
 --async calls and responses
 
 
+function osc_lib.set_param_all(param,val,conditional_param,conditional_value)
+  for k,v in pairs(menu.registrations) do
+    local to = v.ip
+      osc_lib.send({to,10111},'set_call',{param,val,conditional_param,conditional_value})
+  end
 
+end
 
 function osc.event(path,args,from)
   -- print("osc.event path",path)
@@ -72,6 +78,7 @@ function osc.event(path,args,from)
     end
     menu.update_menu()
     if pparams[norns_name] == nil then
+      print("add to pparams")
       pparams[norns_name]=player_params:new()
       -- pparams[norns_name]:get_params(menu.params_loaded, ip, norns_name, script)
       pparams[norns_name]:get_params(menu.params_loaded, ip, norns_name, script)
@@ -155,6 +162,11 @@ function osc.event(path,args,from)
     -- local str = params:string(pix)
     -- print("delta call", from[1], callback, pix,delta,str)
     -- osc_lib.send({from[1],10111},'get_string_response',{callback,pix,str})
+  elseif path=="set_call" then
+    -- osc_lib.send(path,'test_return_async_await',args)
+    local param = args[1]
+    local val = args[2]
+    params:set(param,val)
   elseif path=="delta_call" then
     -- osc_lib.send(path,'test_return_async_await',args)
     local callback = args[1]
