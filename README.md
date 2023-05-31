@@ -1,6 +1,8 @@
 # semiconductor
 
-norns ensemble script
+a norns ensemble script
+
+![](sc.png)
 
 ## background
 this script was written to support the creation of physically gathered together norns ensembles, providing players a way of "conducting" a performance in a non-hierarchical manner.
