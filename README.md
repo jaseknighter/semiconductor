@@ -52,7 +52,7 @@ there are three params that you can sync across all registered norns from the `g
 ### macros
 macros allow you to change multiple paramaters at once, either within a single script or across multiple scripts.
 
-* from the SEMICONDUCTOR mod, enter the `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls. 
+* enter the mod's `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls. 
 * repeat the step above for a different registered norns to set params for multiple norns simultaneously.
 * by default, there are 10 macro controls that params can be mapped to. the variable `max_pmaps` defined in the */lib/globals.lua* file can be updated to generate more or less macro controls
 
