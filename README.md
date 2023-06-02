@@ -30,7 +30,7 @@ the mod also includes macro param features that allow multiple params on multipl
 ### get started
 
 * assemble your ensemble and connect each norns to the network (wifi or physical)
-* turn on the `semiconductor` mod each of the norns and restart
+* turn on the `semiconductor` mod on each of the norns and restart
 * chose one norns to be the *host* and note the host's ip address (e.g. on a piece of paper)
 * in the `PARAMETERS>EDIT` menu of the *host* norns, set the `host enabled` parameter to `true` 
   * IMPORTANT NOTE: only one norns in the ensemble should have this setting set to `true`
