@@ -50,34 +50,33 @@ there are three params that you can sync across all registered norns from the `g
 * `clocks reset`: reset all the norns clocks to sync them with one another 
 
 ### macros
-macros allow you to change multiple paramaters at once, either within a single script or across multiple scripts.
+macros allow you to change multiple parameters at once, either within a single script or across multiple scripts.
 
-* enter the mod's `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls. 
-* repeat the step above for a different registered norns to set params for multiple norns simultaneously.
-* by default, there are 10 macro controls that params can be mapped to. the variable `max_pmaps` defined in the */lib/globals.lua* file can be updated to generate more or less macro controls
+* enter the mod's `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls
+* (optional) repeat the step above for a different registered norns to set params for multiple norns simultaneously
 
 #### changing the macro controls directly
-* the macro controls are found in the main script parameters menu (PARAMETERS>EDIT) at the bottom of the list of params (i.e. following whatever params the main script loads by default into the PARAMETERS>EDIT menu)
+* the macro controls are found in the parameters menu (PARAMETERS>EDIT) at the bottom of the list of params (i.e. following whatever params the main script loads by default)
 * since these macro controls are params, they can be midi mapped (e.g. to a 16n controller)
 
 #### xy controller
 you can change the macro controls directly from the mod menu: 
 
 * map two or more params to a couple of macros (see *macros* above)
-* select `xy` from the mod's `MACROS` menu and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated.
+* select `xy` from the mod's `MACROS` menu and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated
 * you can change which macro controls are updated with the `xy controller` from the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
 * by default, macro controls 1 and 2 are mapped to x and y, respectively
 
 ## misc notes
 ### controlling complex scripts 
-some scripts (e.g. cheat codes and flora) have custom state handling features that will not be accessible from the `semiconductor` mod or, if accessible, may result in errors. *proceed with caution.*
+some scripts have custom state handling features that will not be accessible from the `semiconductor` mod or, if accessible, may result in errors. *proceed with caution.*
 
 ### running a new script after registering
-after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` menu.
+after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` sc_menu.
 
 ### shortcuts to speed up registration
-* for each norns in the ensemble, in the file */lib/globals.lua*, set the parameter `norns_name` to a unique name.
-* for each norns in the ensemble, in the file */lib/globals.lua* set the parameter `host_ip` to the name of the one norns that will act as the host for the ensemble.
+* for each norns in the ensemble, in the file */lib/globals.lua*, set the parameter `norns_name` to a unique name
+* for each norns in the ensemble, in the file */lib/globals.lua* set the parameter `host_ip` to the name of the one norns that will act as the host for the ensemble
 
 ## using this mod with a single norns
 this mod will work with just a single norns (e.g. to take advantage of the macro controls)
