@@ -32,7 +32,7 @@ end
 
 
 function osc.event(path,args,from)
-  old_osc_event(path,args,from)
+  if old_osc_event then old_osc_event(path,args,from) end
   args = args and args or {}
   if path=="register_with_host" then
     menu.registrations[args[2]]={ip=args[1], norns_name=args[2], script=args[3]}
@@ -172,10 +172,15 @@ function osc.event(path,args,from)
     local callback = args[1]
     local pix = args[2]
     local delta = args[3]
+    local prev_val = params:get(pix)
     params:delta(pix,delta)
-    local str = params:string(pix)
-    print("delta call", from[1], callback, pix,delta,str)
-    osc_lib.send({from[1],10111},'get_string_response',{callback,pix,str})
+    if params:get(pix) == prev_val then
+      print("no change in param")
+    else 
+      local str = params:string(pix)
+      print("delta call", from[1], callback, pix,delta,str)
+      osc_lib.send({from[1],10111},'get_string_response',{callback,pix,str})
+    end
   elseif path=="delta_response" then
     local callback = args[1]
     local pix = args[2]
@@ -220,7 +225,6 @@ end
 
 function osc_lib.send(to, path, args)
   args=args and args or {}
-  tab.print(to)
   print("osc_lib send: ", to[1], to[2], path, table.unpack(args))
   osc.send(to, path, args)
 end
