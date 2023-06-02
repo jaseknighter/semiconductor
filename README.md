@@ -45,9 +45,9 @@ the mod also includes macro param features that allow multiple params on multipl
 ### group sync
 there are three params that you can sync across all registered norns from the `group sync >` sub-menu found in `PARAMETERS>EDIT`:
 
-* `output levels`: change all the norns' output levels 
-* `tempos`: change all the norns' tempos
-* `clocks reset`: reset all the norns' clocks to sync them with one another 
+* `output levels`: change all the norns output levels 
+* `tempos`: change all the norns tempos
+* `clocks reset`: reset all the norns clocks to sync them with one another 
 
 ### macros
 macros allow you to change multiple paramaters at once, either within a single script or across multiple scripts.
