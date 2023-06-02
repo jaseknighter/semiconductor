@@ -133,8 +133,8 @@ end
 p.unregister = function()
   -- host_ip=wifi.ip
   local script = norns.state.name
-  for k,v in pairs(menu.registrations) do
-    local reg = menu.registrations[k]
+  for k,v in pairs(sc_menu.registrations) do
+    local reg = sc_menu.registrations[k]
     osc_lib.send({reg.ip,10111}, "unregister",{wifi.ip, p.norns_name, script})
   end
   -- p.update_menu()
@@ -142,7 +142,7 @@ end
 
 p.get_num_registrations = function()
   local num_reg=0
-  for k,v in pairs(menu.registrations) do
+  for k,v in pairs(sc_menu.registrations) do
     if k then num_reg = num_reg+1 end
   end
   return num_reg
@@ -153,7 +153,7 @@ p.get_registration_by_idx = function(idx_target)
     print("no get_registration_by_idx!!!")
   end
   local idx=1
-  for k,v in pairs(menu.registrations) do
+  for k,v in pairs(sc_menu.registrations) do
     if idx==idx_target then return v end
     idx=idx+1
   end

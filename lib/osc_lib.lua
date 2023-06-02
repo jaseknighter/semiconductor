@@ -23,7 +23,7 @@ local osc_lib = {}
 
 
 function osc_lib.set_param_all(param,val,conditional_param,conditional_value)
-  for k,v in pairs(menu.registrations) do
+  for k,v in pairs(sc_menu.registrations) do
     local to = v.ip
       osc_lib.send({to,10111},'set_call',{param,val,conditional_param,conditional_value})
   end
@@ -35,31 +35,31 @@ function osc.event(path,args,from)
   if old_osc_event then old_osc_event(path,args,from) end
   args = args and args or {}
   if path=="register_with_host" then
-    menu.registrations[args[2]]={ip=args[1], norns_name=args[2], script=args[3]}
+    sc_menu.registrations[args[2]]={ip=args[1], norns_name=args[2], script=args[3]}
     print("registered with host",args[1], args[2], args[3])
-    for k,v in pairs(menu.registrations) do
-      local reg = menu.registrations[k]
-      for k1,v1 in pairs(menu.registrations) do
-        local reg1 = menu.registrations[k1]
+    for k,v in pairs(sc_menu.registrations) do
+      local reg = sc_menu.registrations[k]
+      for k1,v1 in pairs(sc_menu.registrations) do
+        local reg1 = sc_menu.registrations[k1]
         osc_lib.send({reg.ip,10111}, "new_norns_registered",{reg1.ip,reg1.norns_name,reg1.script})
       end
     end
-    menu:set_menu_mode("mMAIN_MENU")
+    sc_menu:set_menu_mode("mMAIN_MENU")
   elseif path=="unregister" then
     local reg_ix=1
-    for k,v in pairs(menu.registrations) do
-      local reg = menu.registrations[k]
+    for k,v in pairs(sc_menu.registrations) do
+      local reg = sc_menu.registrations[k]
       if reg.norns_name == args[2] then
         -- remove from local registration table
         print("found script to unregister", args[2],args[3])
         -- if unregistered script is currently selected for editing, clear the params
-        if reg.norns_name == menu.norns_name then
-        -- if reg_ix == menu.selected_script then
+        if reg.norns_name == sc_menu.norns_name then
+        -- if reg_ix == sc_menu.selected_script then
           print("unregistered script is selected!!! clear params!!!")
-          menu.registrations[k]=nil
-          menu.selected_script_unregistered(reg.norns_name)
+          sc_menu.registrations[k]=nil
+          sc_menu.selected_script_unregistered(reg.norns_name)
         else
-          menu.registrations[k]=nil
+          sc_menu.registrations[k]=nil
         end
         reg_ix = reg_ix + 1
       end
@@ -71,17 +71,17 @@ function osc.event(path,args,from)
     local ip=args[1]
     local norns_name=args[2]
     local script=args[3]
-    if params:get("semiconductor_host_enabled")==1 and menu.registrations[norns_name] == nil then
-      menu.registrations[norns_name]={ip=args[1], norns_name=args[2], script=args[3]}
+    if params:get("semiconductor_host_enabled")==1 and sc_menu.registrations[norns_name] == nil then
+      sc_menu.registrations[norns_name]={ip=args[1], norns_name=args[2], script=args[3]}
     else
       print("new_norns_registered: ", args[1], args[2], args[3])
     end
-    menu.update_menu()
+    sc_menu.update_menu()
     if pparams[norns_name] == nil then
       print("add to pparams")
       pparams[norns_name]=player_params:new()
-      -- pparams[norns_name]:get_params(menu.params_loaded, ip, norns_name, script)
-      pparams[norns_name]:get_params(menu.params_loaded, ip, norns_name, script)
+      -- pparams[norns_name]:get_params(sc_menu.params_loaded, ip, norns_name, script)
+      pparams[norns_name]:get_params(sc_menu.params_loaded, ip, norns_name, script)
     end
   elseif path=="script_updated_broadcast" then
     --broadcast message about new script loaded to registered norns

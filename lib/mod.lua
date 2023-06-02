@@ -26,7 +26,7 @@ fileselect = require 'fileselect'
 sc_json = require "semiconductor/lib/json/json"
 
 include('semiconductor/lib/globals')
-menu = include('semiconductor/lib/menu')
+sc_menu = include('semiconductor/lib/menu')
 player_params = include('semiconductor/lib/player_params')
 sc_save_load = include('semiconductor/lib/save_load')
 --lz sc_lorenz = include('semiconductor/lib/macros/lorenz')
@@ -74,21 +74,21 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
     old_osc_event = osc.event
     osc_lib = include('semiconductor/lib/osc_lib')
 
-    menu.local_script_loaded = true
+    sc_menu.local_script_loaded = true
     --lz sc_lorenz.init()
     params:add_separator("semiconductor")
   
     params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
     params:set_action("semiconductor_host_enabled", function(x) 
       if x == 2 then
-        menu.set_host_mode(true)
+        sc_menu.set_host_mode(true)
       else
-        menu.set_host_mode(false)
+        sc_menu.set_host_mode(false)
       end
     end )
     --[[
       --macro control params
-      pix = -- get pix from menu.pmap_vals table
+      pix = -- get pix from sc_menu.pmap_vals table
       local dx = p.fine and (d/20) or d
       local reg = p.get_registration_by_idx(p.selected_script)
       local ip = reg.ip
@@ -216,13 +216,13 @@ end)
 function get_macro_control_map(ix)
   mcm={}
   local script_num = 1
-  for k,v in pairs(menu.registrations) do
+  for k,v in pairs(sc_menu.registrations) do
     local norns_name = v.norns_name
     mcm[script_num] = {}
     mcm[script_num].norns_name = norns_name
     mcm[script_num].ip = v.ip
     mcm[script_num].ixes = {}
-    local pmap_vals = menu.pmap_vals[norns_name]
+    local pmap_vals = sc_menu.pmap_vals[norns_name]
     local num_params = 1
     for k1,v1 in pairs(pmap_vals) do
       if ix == v1 then
@@ -236,15 +236,15 @@ function get_macro_control_map(ix)
 end
 
 --
--- [optional] menu: extending the menu system is done by creating a table with
+-- [optional]   menu: extending the menu system is done by creating a table with
 -- all the required menu functions defined.
 --
 
 
 
 mod.hook.register("script_post_cleanup", "clear the matrix for the next script", function()
-  menu.unregister()
-  menu.reset()
+  sc_menu.unregister()
+  sc_menu.reset()
   print("semiconductor cleanup")
   osc.event = old_osc_event
 end)
@@ -255,7 +255,7 @@ end)
 -- of the mod which is being loaded. in order for the menu to work it must be
 -- registered with a name which matches the name of the mod in the dust folder.
 --
-mod.menu.register(mod.this_name, menu)
+mod.menu.register(mod.this_name, sc_menu)
 
 
 --

@@ -73,10 +73,10 @@ function player_params:new()
       callbacks[cbid] = function(pix,str)
         -- print("get string callback returned",pix,string)
         callbacks[cbid]=nil
-        menu.pvals[pix] = str
-        menu.redraw()
+        sc_menu.pvals[pix] = str
+        sc_menu.redraw()
       end
-      -- menu.pvals[pix]=""
+      -- sc_menu.pvals[pix]=""
       local to = {ip,10111}
       print("send delta call",pix,ip, to[1],to[2])
       osc_lib.send(to,'delta_call',{cbid,pix,delta})
@@ -91,10 +91,10 @@ function player_params:new()
       -- callbacks[cbid] = function(pix,str)
       --   -- print("get string callback returned",pix,string)
       --   callbacks[cbid]=nil
-      --   menu.pvals[pix] = str
-      --   menu.redraw()
+      --   sc_menu.pvals[pix] = str
+      --   sc_menu.redraw()
       -- end
-      -- -- menu.pvals[pix]=""
+      -- -- sc_menu.pvals[pix]=""
       -- local to = {ip,10111}
       -- print("send delta call",pix,ip, to[1],to[2])
       -- osc_lib.send(to,'delta_call',{cbid,pix,delta})
@@ -131,9 +131,9 @@ function player_params:new()
     callbacks[cbid] = function(pix,string)
       -- print("get string callback returned",pix,string)
       callbacks[cbid]=nil
-      menu.pvals[pix] = string
+      sc_menu.pvals[pix] = string
     end
-    menu.pvals[pix]=""
+    sc_menu.pvals[pix]=""
     local to = {ip,10111}
     osc_lib.send(to,'get_string_call',{cbid,pix})
   end

@@ -23,7 +23,7 @@ function xy.redraw()
   -- screen.move(0,10)
   -- screen.text(n)
 
-  if menu.pmaps_set == false then
+  if sc_menu.pmaps_set == false then
     screen.move(64,10*3)
     screen.text_center("no param maps selected")
   else
@@ -34,7 +34,7 @@ function xy.redraw()
 
   end
 
-  -- tab.print(menu.pmap_vals["fatesorange"])
+  -- tab.print(sc_menu.pmap_vals["fatesorange"])
 end
 
 return xy

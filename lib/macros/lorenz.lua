@@ -120,7 +120,7 @@ function lorenz.get_boundary()
 end
 
 function lorenz:clear()
-  -- if norns.menu.status() == false then 
+  -- if norns.sc_menu.status() == false then 
   --   local gd = sound_controller:get_dimensions()
   --   screen.level(0)
   --   screen.rect(gd.x,gd.y,gd.w,gd.h)
@@ -132,7 +132,7 @@ end
 
 
 lorenz.update = function()
-  if menu.pmaps_set == false then
+  if sc_menu.pmaps_set == false then
     screen.move(64,10*3)
     screen.text_center("no param maps selected")
   else

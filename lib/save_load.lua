@@ -29,7 +29,7 @@ function save_load.save_sc_data(name_or_path)
     
     -- save semiconductor_data
     local sc_data = {}
-    sc_data.pmap_vals = deep_copy(menu.pmap_vals)
+    sc_data.pmap_vals = deep_copy(sc_menu.pmap_vals)
      
     local save_object = {}
     save_object = sc_data
@@ -79,8 +79,8 @@ function save_load.load_sc_data(path)
     end
 
     -- load semiconductor data
-    -- menu.registrations                    = deep_copy(sc_data.registrations)
-    menu.pmap_vals                           = deep_copy(sc_data.pmap_vals)
+    -- sc_menu.registrations                    = deep_copy(sc_data.registrations)
+    sc_menu.pmap_vals                           = deep_copy(sc_data.pmap_vals)
 
     print("semiconductor data is now loaded")
           
