@@ -1,6 +1,3 @@
-json = require "semiconductor/lib/json/json"
-osc_lib = include('semiconductor/lib/osc_lib')
-
 local player_params = {}
 player_params.__index = player_params
 
@@ -59,7 +56,7 @@ function player_params:new()
         self.norns_name = norns_name
         self.script = script
         print("norns_name, script",norns_name, script)
-        local prams = json.decode(p.params_json)
+        local prams = sc_json.decode(p.params_json)
         for k,v in pairs(prams) do
           self[k] = v
         end   

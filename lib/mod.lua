@@ -23,6 +23,7 @@ cs = require 'controlspec'
 textentry = require 'textentry'
 fileselect = require 'fileselect'
 
+sc_json = require "semiconductor/lib/json/json"
 
 include('semiconductor/lib/globals')
 menu = include('semiconductor/lib/menu')
@@ -69,11 +70,15 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
   local old_init = init
   init = function()
     old_init()
+    
+    old_osc_event = osc.event
+    osc_lib = include('semiconductor/lib/osc_lib')
+
     menu.local_script_loaded = true
     --lz sc_lorenz.init()
     params:add_separator("semiconductor")
   
-    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},1)
+    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
     params:set_action("semiconductor_host_enabled", function(x) 
       if x == 2 then
         menu.set_host_mode(true)
@@ -240,7 +245,8 @@ end
 mod.hook.register("script_post_cleanup", "clear the matrix for the next script", function()
   menu.unregister()
   menu.reset()
-  print("cleanup")
+  print("semiconductor cleanup")
+  osc.event = old_osc_event
 end)
 
 -- register the mod menu

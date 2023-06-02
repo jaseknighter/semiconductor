@@ -30,8 +30,9 @@ function osc_lib.set_param_all(param,val,conditional_param,conditional_value)
 
 end
 
+
 function osc.event(path,args,from)
-  -- print("osc.event path",path)
+  old_osc_event(path,args,from)
   args = args and args or {}
   if path=="register_with_host" then
     menu.registrations[args[2]]={ip=args[1], norns_name=args[2], script=args[3]}
@@ -40,7 +41,6 @@ function osc.event(path,args,from)
       local reg = menu.registrations[k]
       for k1,v1 in pairs(menu.registrations) do
         local reg1 = menu.registrations[k1]
-        -- osc_lib.send({reg.ip,10111}, "new_norns_registered",{args[1], args[2], args[3]})
         osc_lib.send({reg.ip,10111}, "new_norns_registered",{reg1.ip,reg1.norns_name,reg1.script})
       end
     end
@@ -87,7 +87,7 @@ function osc.event(path,args,from)
     --broadcast message about new script loaded to registered norns
   elseif path=="get_params_call" then
     local callback = args[1]
-    local params_json = json.encode(params)
+    local params_json = sc_json.encode(params)
     local len = string.len(params_json)
     local max_slice = 800
     local num_iterations = math.ceil(len/max_slice)
@@ -218,12 +218,10 @@ function osc.event(path,args,from)
   end
 end
 
---example: osc_lib.send({'169.254.166.46',10111},'test',{'received!!!'})
---example: osc_lib.send({'192.168.0.193',10111},'test',{'received!!!'})
---example: osc_lib.send({'192.168.0.193',10111},'test_call_async_await',{'test!!!'})
 function osc_lib.send(to, path, args)
   args=args and args or {}
-  print("osc_lib send: ", table.unpack(to), path, table.unpack(args))
+  tab.print(to)
+  print("osc_lib send: ", to[1], to[2], path, table.unpack(args))
   osc.send(to, path, args)
 end
 

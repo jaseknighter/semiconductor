@@ -118,12 +118,12 @@ end
 
 -- register norns with host
 p.reg_ip_with_host = function(host_ip)
-  --NOTE: remove this line after testing
   if host_ip ~= nil then -- cancel
     p.set_host_ip(host_ip)
     local script = norns.state.name
     local ip = wifi.ip ~= "" and wifi.ip or host_ip
-    osc_lib.send({host_ip,10111}, "register_with_host",{ip, p.norns_name, script})
+    local to = {host_ip,10111}
+    osc_lib.send(to, "register_with_host",{ip, p.norns_name, script})
   end
   screen.clear()
   p.registering=false
