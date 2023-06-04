@@ -95,23 +95,23 @@ end
 
 function save_load.init()
 
-  params:add_group("semiconductor data",5)
+  params:add_group("sc data",5)
 
   params:add{
     type="option", id = "autosave", name="autosave" ,options={"off","on"}, default=AUTOSAVE_DEFAULT, 
     action=function() end
   }          
 
-  params:add_trigger("save_sc_data", "> SAVE SEMICONDUCTOR DATA")
+  params:add_trigger("save_sc_data", "> SAVE SC DATA")
   params:set_action("save_sc_data", function(x) textentry.enter(save_load.save_sc_data) end)
 
-  params:add_trigger("overwrite_sc_data", "> OVERWRITE SEMICONDUCTOR DATA")
+  params:add_trigger("overwrite_sc_data", "> OVERWRITE SC DATA")
   params:set_action("overwrite_sc_data", function(x) fileselect.enter(folder_path, save_load.save_sc_data) end)
 
-  params:add_trigger("remove_sc_data", "< REMOVE SEMICONDUCTOR DATA")
+  params:add_trigger("remove_sc_data", "< REMOVE SC DATA")
   params:set_action("remove_sc_data", function(x) fileselect.enter(folder_path, save_load.remove_sc_data) end)
 
-  params:add_trigger("load_sc_data", "> LOAD SEMICONDUCTOR DATA" )
+  params:add_trigger("load_sc_data", "> LOAD SC DATA" )
   params:set_action("load_sc_data", function(x) fileselect.enter(folder_path, save_load.load_sc_data) end)
 
 end

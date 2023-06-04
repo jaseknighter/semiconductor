@@ -2,7 +2,7 @@
 
 a norns ensemble script
 
-![](sc.png)
+![](semiconductor.png)
 
 this script was written to support the creation of physically gathered together norns ensembles, providing players a way of "conducting" a performance in a non-hierarchical manner.
 
@@ -55,9 +55,14 @@ macros allow you to change multiple parameters at once, either within a single s
 * enter the mod's `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls
 * (optional) repeat the step above for a different registered norns to set params for multiple norns simultaneously
 
+
+### autosave semiconductor parameter maps
+in the `PARAMETERS>EDIT` menu, the `sc data` sub-menu provides controls to save macros settings as well as the parameters of the currently loaded script.
+
 #### changing the macro controls directly
-* the macro controls are found in the parameters menu (PARAMETERS>EDIT) at the bottom of the list of params (i.e. following whatever params the main script loads by default)
+* the macro controls are found in the parameters menu (`PARAMETERS>EDIT`) at the bottom of the list of params (i.e. following whatever params the main script loads by default)
 * since these macro controls are params, they can be midi mapped (e.g. to a 16n controller)
+
 
 #### xy controller
 you can change the macro controls directly from the mod menu: 
@@ -72,7 +77,7 @@ you can change the macro controls directly from the mod menu:
 some scripts have custom state handling features that will not be accessible from the `semiconductor` mod or, if accessible, may result in errors. *proceed with caution.*
 
 ### running a new script after registering
-after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` sc_menu.
+after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` menu.
 
 ### shortcuts to speed up registration
 * for each norns in the ensemble, in the file */lib/globals.lua*, set the parameter `norns_name` to a unique name
@@ -82,8 +87,8 @@ after registering your norns with the `semiconductor` mod, if you change the scr
 this mod will work with just a single norns (e.g. to take advantage of the macro controls)
 
 ## todo
-* fix bugs
-  * some types of params (e.g. fileselect and trigger) may not work properly
+* fix bugs and cleanup code
+  * some types of params (e.g. fileselect) may appear in the mod's `PLAYERS >` menu, but will not work
   * other issues not yet uncovered
-* add more control interfaces (e.g. a lorenz param controller)
+* add additional macro control interfaces for (e.g. a lorenz param controller)
 
