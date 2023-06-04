@@ -17,13 +17,9 @@ it occurred to me that a whole lot of music performance involves control. also, 
 `https://github.com/jaseknighter/semiconductor`
 
 ## how does it work?
-using this mod, players gather together and connect their norns to the same network.
+using this mod, players gather together and connect their norns to the same network. then, one of the norns is selected by the players to act as a "host." the norns in the ensemble are registered to this host. the host norns broadcasts each registration it receives with all the other devices. once registered, each norns will display the scripts the other norns have currently loaded and players can select parameters from the scripts to (semi)conduct. the parameters that appear in this mod may be controlled just as if the script was running on the norns locally.
 
-then, each of the norns registers itself with one norns that has been selected to act as a "host." the host norns then broadcasts each registration with all the other devices.
-
-once registered, each norns can see what scripts the other norns have currently loaded and select parameters from one or more registered script to (semi)conduct. the remote parameters that appear in this mod may be controlled (more or less) just as if the script was running on the norns locally.
-
-the mod also includes macro param features that allow multiple params on multiple norns to be mapped and controlled from a single macro param. 
+the mod also includes macro param features that allow multiple params on multiple norns to be mapped and controlled from a single macro param. these mappings can be saved for future performances.
 
 ## instructions
 
