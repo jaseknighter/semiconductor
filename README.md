@@ -27,12 +27,13 @@ the mod also includes macro param features that allow multiple params on multipl
 
 * assemble your ensemble and connect each norns to the network (wifi or physical)
 * turn on the `semiconductor` mod on each of the norns and restart
-* chose one norns to be the *host* and note the host's ip address (e.g. on a piece of paper)
-* in the `PARAMETERS>EDIT` menu of the *host* norns, set the `host enabled` parameter to `true` 
-  * IMPORTANT NOTE: only one norns in the ensemble should have this setting set to `true`
-* enter the `semiconductor` mod menu
-* enter the `REGISTER >` menu, select `register`, provide a name for your norns and then when prompted enter the ip address of the host (note: see *shortcuts* below)
-* enter the `PLAYERS >` menu and select a script to conduct 
+* select a script to run on each norns in the ensemble
+* chose one norns to be the *host* and note the host's ip address (note: see *shortcuts* below)
+* enter the `semiconductor` mod menu and:
+   * with the *host* norns only: set `host enabled` to `true` 
+   * with all norns in the ensemble:
+      * enter the `REGISTER >` menu, select `register`, provide a name for your norns and then when prompted enter the ip address of the host (note: see *shortcuts* below)
+      * enter the `PLAYERS >` menu and select a script to conduct 
 
 ### leave the ensemble
 * enter the `semiconductor` mod menu
@@ -51,7 +52,6 @@ macros allow you to change multiple parameters at once, either within a single s
 * enter the mod's `PMAP` menu, select a registered norns, and set one or more of the listed params to one of the macro controls
 * (optional) repeat the step above for a different registered norns to set params for multiple norns simultaneously
 
-
 ### autosave semiconductor parameter maps
 in the `PARAMETERS>EDIT` menu, the `sc data` sub-menu provides controls to save macros settings as well as the parameters of the currently loaded script.
 
@@ -59,14 +59,6 @@ in the `PARAMETERS>EDIT` menu, the `sc data` sub-menu provides controls to save 
 * the macro controls are found in the parameters menu (`PARAMETERS>EDIT`) at the bottom of the list of params (i.e. following whatever params the main script loads by default)
 * since these macro controls are params, they can be midi mapped (e.g. to a 16n controller)
 
-
-#### xy controller
-you can change the macro controls directly from the mod menu: 
-
-* map two or more params to a couple of macros (see *macros* above)
-* select `xy` from the mod's `MACROS` menu and a dot will appear that can be moved with E2 and E3. as the dot moves, two of the macro controls will be updated
-* you can change which macro controls are updated with the `xy controller` from the PARAMETERS>EDIT menu by updating the `macro x` and `macro y` parameters to map to one of the 10 `macro controls`
-* by default, macro controls 1 and 2 are mapped to x and y, respectively
 
 ## misc notes
 ### controlling complex scripts 
@@ -76,8 +68,9 @@ some scripts have custom state handling features that will not be accessible fro
 after registering your norns with the `semiconductor` mod, if you change the script you are running locally, all the other registered norns will be notified of the change and any norns that had your script selected will have to select a new script in the `PLAYERS >` menu.
 
 ### shortcuts to speed up registration
-* for each norns in the ensemble, in the file */lib/globals.lua*, set the parameter `norns_name` to a unique name
-* for each norns in the ensemble, in the file */lib/globals.lua* set the parameter `host_ip` to the name of the one norns that will act as the host for the ensemble
+* for each norns in the ensemble, in the file */lib/globals.lua*: 
+  * set the parameter `norns_name` to a unique name
+  * set the parameter `host_ip` to the name of the one norns that will act as the "host" for the ensemble
 
 ## using this mod with a single norns
 this mod will work with just a single norns (e.g. to take advantage of the macro controls)
@@ -86,5 +79,5 @@ this mod will work with just a single norns (e.g. to take advantage of the macro
 * fix bugs and cleanup code
   * some types of params (e.g. fileselect) may appear in the mod's `PLAYERS >` menu, but will not work
   * other issues not yet uncovered
-* add additional macro control interfaces for (e.g. a lorenz param controller)
+* add macro control interfaces (e.g. a lorenz algorithm param controller)
 

@@ -1,5 +1,7 @@
 host_ip = ""
 norns_name = ""
+sc_host_enabled = false
+
 pparams={}
 callbacks={}
 max_pmaps = 10

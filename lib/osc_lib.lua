@@ -71,7 +71,8 @@ function osc.event(path,args,from)
     local ip=args[1]
     local norns_name=args[2]
     local script=args[3]
-    if params:get("semiconductor_host_enabled")==1 and sc_menu.registrations[norns_name] == nil then
+    -- if params:get("semiconductor_host_enabled")==1 and sc_menu.registrations[norns_name] == nil then
+    if sc_host_enabled == false and sc_menu.registrations[norns_name] == nil then
       sc_menu.registrations[norns_name]={ip=args[1], norns_name=args[2], script=args[3]}
     else
       print("new_norns_registered: ", args[1], args[2], args[3])

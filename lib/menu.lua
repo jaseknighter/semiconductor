@@ -9,9 +9,11 @@ local xy = include('semiconductor/lib/macros/xy')
 
 -- pparams={}
 
-local mode_items_prereg = { "REGISTER >"}
-local mode_items_postreg = { "REGISTER >", "PLAYERS >","PMAP >", "MACROS >"}
-local mode_items = mode_items_prereg
+local mode_items_prereg = { "host enabled", "REGISTER >"}
+local mode_items_postreg = { "host enabled", "REGISTER >", "PLAYERS >","PMAP >"}
+-- local mode_items_postreg = { "host enabled", "REGISTER >", "PLAYERS >","PMAP >", "MACROS >"}
+local mode_items = {"please load a script"}
+-- local mode_items = mode_items_prereg
 local reg_texts_pre = {"register"}
 local reg_texts_post = {"register","unregister"}
 local reg_texts = reg_texts_pre
@@ -21,13 +23,13 @@ local macro_texts = {"xy"}
 
 local p = {
   mMAIN_MENU = 0,
-  mREGISTER = 1,
-  mSCRIPT_SELECT = 2,
-  mEDIT = 3,
-  mPMAP_SCRIPT_SELECT = 4,
-  mPMAP_EDIT = 5,
-  mMACRO_SELECT = 6,
-  mMACRO_CONTROL = 7,
+  mREGISTER = 2,
+  mSCRIPT_SELECT = 3,
+  mEDIT = 4,
+  mPMAP_SCRIPT_SELECT = 5,
+  mPMAP_EDIT = 6,
+  mMACRO_SELECT = 7,
+  mMACRO_CONTROL = 8,
   pvals = {},
   pmap_vals = {},
   pmaps_set=false,
@@ -62,7 +64,8 @@ local p = {
   reg_ip=nil,
   norns_name=nil,
   send = {},
-  local_script_loaded = nil,
+  local_script_loaded = false,
+  host_mode = sc_host_enabled,
   on = {},
 }
 
@@ -94,6 +97,11 @@ end
 p.set_host_mode = function(act_as_host)
   p.host_mode = act_as_host
 end
+
+p.get_host_mode = function(act_as_host)
+  return p.host_mode
+end
+
 -- broadcast added registration
 p.host_registration_added = function(norns_name)
   -- table.insert(p.registrations,{host_ip=host_ip, my_ip=wifi.ip,norns_name=p.norns_name, my_script=script})
@@ -163,7 +171,7 @@ p.update_menu = function()
   if p.get_num_registrations() > 0 then
     mode_items = mode_items_postreg
     reg_texts = reg_texts_post
-  else
+  elseif p.local_script_loaded == true then
     mode_items = mode_items_prereg
     reg_texts = reg_texts_pre
   end
@@ -256,7 +264,7 @@ p.key = function(n,z)
   elseif p.mode == p.mMAIN_MENU then
     if n==2 and z== 1 then
       mod.menu.exit()    
-    elseif n==3 and z==1 then
+    elseif n==3 and z==1 and p.local_script_loaded == true then
       if p.mode_pos == p.mREGISTER then
         p.mode = p.mREGISTER
       elseif p.mode_pos == p.mSCRIPT_SELECT then
@@ -506,11 +514,21 @@ p.key = function(n,z)
 end
 
 p.enc = function(n,d)
+  
   -- MODE MENU
   if p.mode == p.mMAIN_MENU then
-    local prev = p.mode_pos
-    p.mode_pos = util.clamp(p.mode_pos + d, 1, #mode_items)
-    if p.mode_pos ~= prev then _menu.redraw() end
+    if n==2 then
+      local prev = p.mode_pos
+      p.mode_pos = util.clamp(p.mode_pos + d, 1, #mode_items)
+      -- p.mode_pos = util.clamp(p.mode_pos + d, 1, #mode_items)
+      if p.mode_pos ~= prev then _menu.redraw() end
+    elseif n==3 and sc_menu.mode_pos == 1 then
+      if d > 0 and p.get_host_mode() == false then
+        sc_menu.set_host_mode(true)
+      elseif d < 0 and p.get_host_mode() == true then
+        sc_menu.set_host_mode(false)
+      end
+    end
   -- MODE REGISTER
   elseif p.mode == p.mREGISTER then
     if n==2 and p.alt==false then
@@ -689,8 +707,18 @@ p.redraw = function()
     screen.text("SEMICONDUCTOR")
     for i=1,#mode_items do
       if i==p.mode_pos then screen.level(15) else screen.level(4) end
-      screen.move(0,10*i+20)
-      screen.text(mode_items[i])
+      if p.local_script_loaded then
+        screen.move(0,10*i+20)
+        screen.text(mode_items[i])
+      else 
+        screen.move(64,10*i+20)
+        screen.text_center(mode_items[i])
+      end
+
+      if i==1 and p.local_script_loaded then
+        screen.move(127,10*i+20)
+        screen.text_right(p.get_host_mode() == true and "true" or "false")
+      end
     end
   -- REGISTER SCRIPT
   elseif p.mode == p.mREGISTER and p.registering == false then

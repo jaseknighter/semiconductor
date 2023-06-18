@@ -41,7 +41,8 @@ sc_save_load = include('semiconductor/lib/save_load')
 --
 
 local state = {
-  norns_ips = {} -- table for ips of registered norns 
+  norns_ips = {}, -- table for ips of registered norns 
+  inited = false,
 }
 
 
@@ -62,7 +63,10 @@ local state = {
 mod.hook.register("system_post_startup", "semiconductor startup", function()
   state.system_post_startup = true
   print("semiconductor post startup!!!")
+  
 end)
+
+
 
 mod.hook.register("script_pre_init", "semiconductor init", function()
   -- tweak global environment here ahead of the script `init()` function being called
@@ -78,14 +82,15 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
     --lz sc_lorenz.init()
     params:add_separator("semiconductor")
   
-    params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
-    params:set_action("semiconductor_host_enabled", function(x) 
-      if x == 2 then
-        sc_menu.set_host_mode(true)
-      else
-        sc_menu.set_host_mode(false)
-      end
-    end )
+    -- params:add_option("semiconductor_host_enabled","host enbaled", {"false", "true"},2)
+    -- params:set_action("semiconductor_host_enabled", function(x) 
+    --   if x == 2 then
+    --     sc_menu.set_host_mode(true)
+    --   else
+    --     sc_menu.set_host_mode(false)
+    --   end
+    -- end )
+    
     --[[
       --macro control params
       pix = -- get pix from sc_menu.pmap_vals table
@@ -118,16 +123,18 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
         params:set_action("macro_control"..i, function(val) 
           mcm = get_macro_control_map(i)
           for i=1,#mcm do
-            local norns_name = mcm[i].norns_name
-            local ip = mcm[i].ip
-            for j=1,#mcm[i].ixes do
-              pparams[norns_name]:set_to_range(ip,mcm[i].ixes[j],val)
+            if mcm[i].norns_name then
+              local norns_name = mcm[i].norns_name
+              local ip = mcm[i].ip
+              for j=1,#mcm[i].ixes do
+                pparams[norns_name]:set_to_range(ip,mcm[i].ixes[j],val)
+              end
             end
           end
         end)
     end
-    params:add_number("macro_x","macro x",1,max_pmaps,1)
-    params:add_number("macro_y","macro y",2,max_pmaps,2)
+    -- params:add_number("macro_x","macro x",1,max_pmaps,1)
+    -- params:add_number("macro_y","macro y",2,max_pmaps,2)
 
   --[[ lorenz
     --lorenz params
@@ -210,12 +217,14 @@ mod.hook.register("script_pre_init", "semiconductor init", function()
   ]]
 
     sc_save_load.init()
+    state.inited = true
   end
 end)
 
 function get_macro_control_map(ix)
   mcm={}
   local script_num = 1
+  if sc_menu.registrations == nil then return nil end
   for k,v in pairs(sc_menu.registrations) do
     local norns_name = v.norns_name
     mcm[script_num] = {}
@@ -224,10 +233,12 @@ function get_macro_control_map(ix)
     mcm[script_num].ixes = {}
     local pmap_vals = sc_menu.pmap_vals[norns_name]
     local num_params = 1
-    for k1,v1 in pairs(pmap_vals) do
-      if ix == v1 then
-        mcm[script_num].ixes[num_params] = k1
-        num_params = num_params + 1
+    if pmap_vals then
+      for k1,v1 in pairs(pmap_vals) do
+        if ix == v1 then
+          mcm[script_num].ixes[num_params] = k1
+          num_params = num_params + 1
+        end
       end
     end
     script_num = script_num + 1
@@ -247,6 +258,7 @@ mod.hook.register("script_post_cleanup", "clear the matrix for the next script",
   sc_menu.reset()
   print("semiconductor cleanup")
   osc.event = old_osc_event
+
 end)
 
 -- register the mod menu
